@@ -10,7 +10,7 @@ function printLabel(labelledObj: LabelledValue){
     console.log('labelledObj.label = ' + labelledObj.label);
 }
 
-// Notice that there is no interface implementation. It is just a type definition
+// Note that there is no interface implementation. It is just a type definition
 var myObj: LabelledValue = {
     size: 10,
     label: 'Size 10 Object'
@@ -72,7 +72,7 @@ var mySearch: SearchFunc;
 //Note that the name of parameters doesn't matter
 mySearch = function (hay: string, needle: string) {
     var result = hay.search(needle);
-    //return 'hiho'; //The return type is checked implicitly
+    //return 'hiho'; //The return type is checked "implicitly"
     return !(result == -1);
 };
 
@@ -96,7 +96,7 @@ interface Dictionary{
 
 //#Implementing an interface
 interface ClockInterface{
-    //All fields are always public
+    //All fields are always public, why would you need private interface?
     currentTime: Date; //Variable
     setTime(d: Date); //Method
 }
@@ -111,3 +111,69 @@ class Clock implements ClockInterface{
     //Class has constructor
     constructor(h: number, m: number){}
 }
+
+//====================================
+//# Differences between static/instance of the class
+//====================================
+
+interface ClockStatic{
+    new (hour: number, minute: number); //static
+}
+
+//Error TS2420: Class 'Clock2' incorrectly implements interface
+//class Clock2 implements ClockStatic{
+//    currentTime: Date;
+//    constructor(h: number, m: number){}
+//}
+
+//Instead, you need to do it this way
+class Clock2 { //Notice that there's no "implements ClockStatic" !!
+    currentTime: Date;
+    constructor(h: number, m: number){}
+}
+
+var cs: ClockStatic = Clock;
+var clockInstance = new cs(7, 30);
+
+
+
+//====================================
+//# Extending interface
+//====================================
+interface Shape{
+    color: string;
+}
+
+interface Square extends Shape{
+    sideLength: number;
+}
+
+var square = <Square>{};
+square.sideLength = 6;
+square.color = 'blue';
+
+//You can do multiple extends !!
+
+interface ShadeObject{
+    opacity: number;
+}
+
+interface ShadeSquare extends Square, ShadeObject{
+
+}
+
+//====================================
+//# Hybrid types (being both function and object)
+//====================================
+interface Counter{
+    (start: number): string;
+    interval: number;
+    reset(): void;
+}
+
+var counter: Counter; //Note that this is just an interface
+counter(10);
+counter.reset();
+counter.interval = 5.0;
+
+//You will usually encounter this with 3rd party JS library
